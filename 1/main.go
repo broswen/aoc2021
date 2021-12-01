@@ -21,10 +21,12 @@ func NewSlidingWindowInt(size int) SlidingWindowInt {
 }
 
 func (swi SlidingWindowInt) String() string {
+	// implement Stringer
 	return fmt.Sprintf("%v: %d", swi.Values, swi.Sum())
 }
 
 func (swi SlidingWindowInt) Sum() int {
+	// range over values and return sum
 	sum := 0
 	for _, v := range swi.Values {
 		sum += v
@@ -33,13 +35,16 @@ func (swi SlidingWindowInt) Sum() int {
 }
 
 func (swi SlidingWindowInt) Full() bool {
+	// if the len of the values is the size, then it is full
 	return len(swi.Values) == swi.Size
 }
 
 func (swi *SlidingWindowInt) Append(value int) {
+	// append if buffer isn't full
 	if len(swi.Values) < swi.Size {
 		swi.Values = append(swi.Values, value)
 	} else {
+		// if full, overwrite the first value and append new value
 		copy(swi.Values, swi.Values[1:])
 		swi.Values[swi.Size-1] = value
 	}
