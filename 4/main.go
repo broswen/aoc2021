@@ -70,6 +70,10 @@ func (b Board) Sum(marked bool) int {
 	return sum
 }
 
+func (b Board) Score() int {
+	return b.Sum(false) * b.WinningNumber
+}
+
 func getLines(filename string) []string {
 	file, err := os.Open(filename)
 	if err != nil {
@@ -120,27 +124,27 @@ func parseBoardRow(row string) [5]int {
 func main() {
 	lines := getLines("input.txt")
 	numbers := parseNumbers(lines[0])
-	boards := make([]Board, 0)
+	boards := make(map[int]*Board, 0)
+	count := 0
 	for i := 2; i < len(lines); i += 6 {
 		temp := [5]string{}
 		copy(temp[:], lines[i:i+5])
 		b := parseBoard(temp)
-		boards = append(boards, b)
+		boards[count] = &b
+		count++
 	}
 
-	wins := 0
 	for _, v := range numbers {
-		for i := range boards {
-			if boards[i].Play(v) {
-				wins++
-				if wins == len(boards) {
-					log.Println(boards[i].Sum(false) * boards[i].WinningNumber)
+		for k := range boards {
+			if boards[k].Play(v) {
+				if len(boards) == 1 {
+					fmt.Println(boards[k])
+					log.Println(boards[k].Sum(false) * boards[k].WinningNumber)
+					return
 				}
-				return
+				delete(boards, k)
+
 			}
 		}
 	}
-	// for _, b := range boards {
-	// 	fmt.Println(b)
-	// }
 }
