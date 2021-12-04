@@ -128,10 +128,14 @@ func main() {
 		boards = append(boards, b)
 	}
 
+	wins := 0
 	for _, v := range numbers {
 		for i := range boards {
 			if boards[i].Play(v) {
-				log.Println(boards[i].Sum(false) * boards[i].WinningNumber)
+				wins++
+				if wins == len(boards) {
+					log.Println(boards[i].Sum(false) * boards[i].WinningNumber)
+				}
 				return
 			}
 		}
