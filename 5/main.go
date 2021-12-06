@@ -76,7 +76,7 @@ func (f Floor) String() string {
 			if f.Counts[i][j] == 0 {
 				s += "."
 			} else {
-				s += fmt.Sprintf("%d")
+				s += fmt.Sprintf("%d", f.Counts[i][j])
 			}
 		}
 		s += "\n"
