@@ -103,6 +103,7 @@ func main() {
 	inputLines := getLines("input.txt")
 	// lines := make([]Line, len(inputLines))
 	floor := Floor{}
+	danger := 0
 	for i, line := range inputLines {
 		log.Println("parsing line", i)
 		l, err := NewLine(line)
@@ -125,6 +126,9 @@ func main() {
 		x := l.Start.X
 		y := l.Start.Y
 		for {
+			if floor.Counts[y][x] == 1 {
+				danger++
+			}
 			floor.Counts[y][x]++
 			if x == l.End.X && y == l.End.Y {
 				break
@@ -133,14 +137,13 @@ func main() {
 			y += dy
 		}
 	}
-	danger := 0
-	for _, row := range floor.Counts {
-		for j := range row {
-			if row[j] > 1 {
-				danger++
-			}
-		}
-	}
+	// for _, row := range floor.Counts {
+	// 	for j := range row {
+	// 		if row[j] > 1 {
+	// 			danger++
+	// 		}
+	// 	}
+	// }
 	output, _ := os.Create("output.txt")
 	defer output.Close()
 	for _, row := range floor.Counts {
