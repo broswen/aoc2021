@@ -27,10 +27,20 @@ func NewPoint(input string) (Point, error) {
 	return Point{x, y}, nil
 }
 
+func (p Point) Add(p2 Point) Point {
+	return Point{
+		X: p.X + p2.X,
+		Y: p.Y + p2.Y,
+	}
+}
+
+func (p Point) Equals(p2 Point) bool {
+	return p.X == p2.X && p.Y == p2.Y
+}
+
 type Line struct {
-	Start  Point
-	End    Point
-	Points []Point
+	Start Point
+	End   Point
 }
 
 func NewLine(input string) (Line, error) {
@@ -46,9 +56,8 @@ func NewLine(input string) (Line, error) {
 	}
 
 	return Line{
-		Start:  start,
-		End:    end,
-		Points: make([]Point, 0),
+		Start: start,
+		End:   end,
 	}, nil
 }
 
@@ -57,13 +66,13 @@ func (l Line) String() string {
 }
 
 type Floor struct {
-	Counts [100][100]int
+	Counts [1000][1000]int
 }
 
 func (f Floor) String() string {
 	s := ""
-	for i := 0; i < 100; i++ {
-		for j := 0; j < 100; j++ {
+	for i := 0; i < 1000; i++ {
+		for j := 0; j < 1000; j++ {
 			if f.Counts[i][j] == 0 {
 				s += "."
 			} else {
@@ -92,18 +101,50 @@ func getLines(filename string) []string {
 
 func main() {
 	inputLines := getLines("input.txt")
-	lines := make([]Line, len(inputLines))
+	// lines := make([]Line, len(inputLines))
 	floor := Floor{}
 	for i, line := range inputLines {
+		log.Println("parsing line", i)
 		l, err := NewLine(line)
+		log.Println(l)
 		if err != nil {
 			log.Fatalf("couldn't parse line: %v\n", err)
 		}
-		lines[i] = l
+		dx := l.End.X - l.Start.X
+		dy := l.End.Y - l.Start.Y
+		if dx > 0 {
+			dx = 1
+		} else if dx < 0 {
+			dx = -1
+		}
+		if dy > 0 {
+			dy = 1
+		} else if dy < 0 {
+			dy = -1
+		}
+		x := l.Start.X
+		y := l.Start.Y
+		for {
+			floor.Counts[y][x]++
+			if x == l.End.X && y == l.End.Y {
+				break
+			}
+			x += dx
+			y += dy
+		}
 	}
-	for _, l := range lines {
-		fmt.Println(l)
+	danger := 0
+	for _, row := range floor.Counts {
+		for j := range row {
+			if row[j] > 1 {
+				danger++
+			}
+		}
 	}
-	log.Println(len(lines))
-	fmt.Println(floor)
+	output, _ := os.Create("output.txt")
+	defer output.Close()
+	for _, row := range floor.Counts {
+		output.WriteString(fmt.Sprintf("%v\n", row))
+	}
+	log.Println(danger)
 }
