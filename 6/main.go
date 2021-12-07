@@ -2,25 +2,12 @@ package main
 
 import (
 	"bufio"
+	"fmt"
 	"log"
 	"os"
 	"strconv"
 	"strings"
 )
-
-type Fish struct {
-	Timer int
-}
-
-func (f *Fish) Live() []Fish {
-	f.Timer--
-	if f.Timer == 0 {
-		// ready to spawn a new fish
-		f.Timer = 6
-		return []Fish{{Timer: 8}}
-	}
-	return []Fish{}
-}
 
 func getLines(filename string) []string {
 	file, err := os.Open(filename)
@@ -67,17 +54,58 @@ func Day(numbers []int) []int {
 	return numbers
 }
 
+func DayMap(fish map[int]int) map[int]int {
+	newMap := make(map[int]int)
+	for k, v := range fish {
+		switch k {
+		case 0:
+			newMap[6] += v
+			newMap[8] = v
+		case 1:
+			fallthrough
+		case 2:
+			fallthrough
+		case 3:
+			fallthrough
+		case 4:
+			fallthrough
+		case 5:
+			fallthrough
+		case 6:
+			fallthrough
+		case 7:
+			fallthrough
+		case 8:
+			newMap[k-1] += v
+		default:
+			log.Fatalf("invalid count value: %v\n", k)
+		}
+	}
+	return newMap
+}
+
 // 2140412022350 guess for part 2
+// 1631647919273 actual answer
 func main() {
 	inputLines := getLines("input.txt")
 	numbers := parseNumbers(inputLines[0])
 	log.Println(len(numbers))
-
-	for i := 0; i < 256; i++ {
-		// log.Println("day", i)
-		numbers = Day(numbers)
+	fish := make(map[int]int)
+	for _, v := range numbers {
+		fish[v]++
 	}
 
-	log.Println(len(numbers))
+	for i := 0; i < 256; i++ {
+		fish = DayMap(fish)
+	}
+
+	fmt.Println(fish)
+
+	sum := 0
+	for _, v := range fish {
+		sum += v
+	}
+
+	fmt.Println(sum)
 
 }
